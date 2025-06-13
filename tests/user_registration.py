@@ -1,29 +1,26 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import conftest
 
-driver = webdriver.Chrome()
-driver.get(conftest.BASE_URL)
+import helpers
+from data import *
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Вход и регистрация')]").click()
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Нет аккаунта')]").click()
+def test_user_registration(driver):
+    driver, wait = driver
 
-driver.find_element(By.NAME, "email").send_keys(conftest.generate_random_email())
-driver.find_element(By.NAME, "password").send_keys("12345")
-driver.find_element(By.NAME, "submitPassword").send_keys("12345")
-driver.find_element(By.XPATH, "//button[contains(text(), 'Создать аккаунт')]").click()
+    driver.find_element(By.XPATH, LOGIN_AND_REGISTRATION_BUTTON_XPATH).click()
 
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".circleSmall")))
+    driver.find_element(By.XPATH, NO_ACCOUNT_BUTTON_XPATH).click()
 
-user_avatar = driver.find_element(By.CSS_SELECTOR, '.circleSmall')
-user_name = driver.find_element(By.CLASS_NAME, "name")
+    driver.find_element(By.NAME, EMAIL_INPUT_NAME).send_keys(helpers.generate_random_email())
+    driver.find_element(By.NAME, PASSWORD_INPUT_NAME).send_keys(TEST_PASSWORD_1)
+    driver.find_element(By.NAME, SUBMIT_PASSWORD_INPUT_NAME).send_keys(TEST_PASSWORD_1)
+    driver.find_element(By.XPATH, CREATE_ACCOUNT_BUTTON_XPATH).click()
 
-assert user_name.text == "User.", "user_name не равен 'User.'"
-assert user_avatar.is_displayed(), "user_avatar не отображается"
+    wait.until(EC.visibility_of_element_located((By.XPATH, AVATAR_BUTTON_CSS_XPATH)))
 
-print("Пользователь зарегистрирован. Тест пройден успешно!")
+    user_avatar = driver.find_element(By.XPATH, AVATAR_BUTTON_CSS_XPATH)
+    user_name = driver.find_element(By.CLASS_NAME, USER_NAME)
 
-driver.quit()
+    assert user_name.text == "User.", "user_name не равен 'User.'"
+    assert user_avatar.is_displayed(), "user_avatar не отображается"

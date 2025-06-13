@@ -1,40 +1,38 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import conftest
 
-driver = webdriver.Chrome()
-driver.get(conftest.BASE_URL)
+from data import *
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Вход и регистрация')]").click()
-driver.find_element(By.XPATH, "//button[contains(text(), 'Нет аккаунта')]").click()
 
-email_input = driver.find_element(By.NAME, "email")
-email_input_wrapper = driver.find_element(By.XPATH, "//*[@id='root']/div/div[2]/div[5]/form/div[2]/div[1]/div/div")
+def test_user_registration_with_wrong_email(driver):
+    driver, wait = driver
 
-password_input = driver.find_element(By.NAME, "password")
-password_input_wrapper = driver.find_element(By.XPATH, "//*[@id='root']/div/div[2]/div[5]/form/div[2]/div[2]/div/div")
+    driver.find_element(By.XPATH, LOGIN_AND_REGISTRATION_BUTTON_XPATH).click()
+    driver.find_element(By.XPATH, NO_ACCOUNT_BUTTON_XPATH).click()
 
-submit_password_input = driver.find_element(By.NAME, "submitPassword")
-submit_password_input_wrapper = driver.find_element(By.XPATH, "//*[@id='root']/div/div[2]/div[5]/form/div[2]/div[3]/div/div")
+    email_input = driver.find_element(By.NAME, EMAIL_INPUT_NAME)
+    email_input_wrapper = driver.find_element(By.XPATH, EMAIL_INPUT_WRAPPER_XPATH)
 
-email_input.send_keys("test@ru")
-password_input.send_keys("12345")
-submit_password_input.send_keys("12345")
+    password_input = driver.find_element(By.NAME, PASSWORD_INPUT_NAME)
+    password_input_wrapper = driver.find_element(By.XPATH, PASSWORD_INPUT_WRAPPER_XPATH)
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Создать аккаунт')]").click()
+    submit_password_input = driver.find_element(By.NAME, SUBMIT_PASSWORD_INPUT_NAME)
+    submit_password_input_wrapper = driver.find_element(By.XPATH, SUBMIT_PASSWORD_INPUT_WRAPPER_XPATH)
 
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".input_span__yWPqB")))
+    email_input.send_keys(TEST_EMAIL_1)
+    password_input.send_keys(TEST_PASSWORD_1)
+    submit_password_input.send_keys(TEST_PASSWORD_1)
 
-error_message = driver.find_element(By.CSS_SELECTOR, '.input_span__yWPqB')
-expected_error_border_color = "rgb(255, 105, 114)"
+    driver.find_element(By.XPATH, CREATE_ACCOUNT_BUTTON_XPATH).click()
 
-assert error_message.is_displayed(), "Текст ошибки не отображается"
-assert email_input_wrapper.value_of_css_property("border-color") == expected_error_border_color, "Цвет бордера поля email не соответствует ожидаемому"
-assert password_input_wrapper.value_of_css_property("border-color") == expected_error_border_color, "Цвет бордера поля password не соответствует ожидаемому"
-assert submit_password_input_wrapper.value_of_css_property("border-color") == expected_error_border_color, "Цвет бордера поля submitPassword не соответствует ожидаемому"
+    wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, INPUT_SPAN_CSS_SELECTOR)))
 
-print("Ошибка. Введен невалидный email. Тест пройден успешно!")
+    error_message = driver.find_element(By.CSS_SELECTOR, INPUT_SPAN_CSS_SELECTOR)
 
-driver.quit()
+    assert error_message.is_displayed(), "Текст ошибки не отображается"
+    assert email_input_wrapper.value_of_css_property(
+        "border-color") == EXPECTED_ERROR_BORDER_COLOR, "Цвет бордера поля email не соответствует ожидаемому"
+    assert password_input_wrapper.value_of_css_property(
+        "border-color") == EXPECTED_ERROR_BORDER_COLOR, "Цвет бордера поля password не соответствует ожидаемому"
+    assert submit_password_input_wrapper.value_of_css_property(
+        "border-color") == EXPECTED_ERROR_BORDER_COLOR, "Цвет бордера поля submitPassword не соответствует ожидаемому"

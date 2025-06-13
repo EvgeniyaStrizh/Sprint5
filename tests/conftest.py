@@ -1,12 +1,14 @@
-import random
-import string
+import pytest
+from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
 
-BASE_URL = "https://qa-desk.stand.praktikum-services.ru/"
-
-def generate_random_email(domain="example.com", length=8):
-    letters = string.ascii_lowercase + string.digits
-    username = ''.join(random.choice(letters) for _ in range(length))
-    return f"{username}@{domain}"
+import data
 
 
- 
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome()
+    driver.get(data.BASE_URL)
+    wait = WebDriverWait(driver, 20)
+    yield driver, wait
+    driver.quit()

@@ -1,18 +1,12 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import conftest
 
-driver = webdriver.Chrome()
-driver.get(conftest.BASE_URL)
+from data import *
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Разместить объявление')]").click()
 
-pop_up = driver.find_element(By.CSS_SELECTOR, '.popUp_shell__LuyqR')
+def test_creating_an_ad_without_login(driver):
+    driver, wait = driver
 
-assert pop_up.is_displayed(), "Модальное окно не отображается"
+    driver.find_element(By.XPATH, CREATE_AD_BUTTON_XPATH).click()
+    pop_up = driver.find_element(By.CSS_SELECTOR, POPUP_CSS_SELECTOR)
 
-print("Отображается модальное окно с заголовком 'Чтобы разместить объявление, авторизуйтесь'. Тест пройден успешно!")
-
-driver.quit()
+    assert pop_up.is_displayed(), "Модальное окно не отображается"

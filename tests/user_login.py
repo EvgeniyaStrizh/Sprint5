@@ -1,26 +1,20 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-import conftest
 
-driver = webdriver.Chrome()
-driver.get(conftest.BASE_URL)
+from data import *
 
-driver.find_element(By.XPATH, "//button[contains(text(), 'Вход и регистрация')]").click()
 
-driver.find_element(By.NAME, "email").send_keys("test@ya.ru")
-driver.find_element(By.NAME, "password").send_keys("12345")
-driver.find_element(By.XPATH, "//button[contains(text(), 'Войти')]").click()
+def test_user_login(driver):
+    driver, wait = driver
 
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".circleSmall")))
+    driver.find_element(By.XPATH, LOGIN_AND_REGISTRATION_BUTTON_XPATH).click()
 
-user_avatar = driver.find_element(By.CSS_SELECTOR, '.circleSmall')
-user_name = driver.find_element(By.CLASS_NAME, "name")
+    driver.find_element(By.NAME, EMAIL_INPUT_NAME).send_keys(TEST_EMAIL_1)
+    driver.find_element(By.NAME, PASSWORD_INPUT_NAME).send_keys(TEST_PASSWORD_1)
+    driver.find_element(By.XPATH, LOGIN_BUTTON_XPATH).click()
 
-assert user_name.text == "User.", "user_name не равен 'User.'"
-assert user_avatar.is_displayed(), "user_avatar не отображается"
+    user_avatar = wait.until(EC.visibility_of_element_located((By.XPATH, AVATAR_BUTTON_CSS_XPATH)))
+    user_name = driver.find_element(By.CLASS_NAME, USER_NAME)
 
-print("Пользователь залогинен. Тест пройден успешно!")
-
-driver.quit()
+    assert user_name.text == "User.", "user_name не равен 'User.'"
+    assert user_avatar.is_displayed(), "user_avatar не отображается"
